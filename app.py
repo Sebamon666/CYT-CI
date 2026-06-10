@@ -25,8 +25,6 @@ else:
     tabla = data.rename(columns={"N_Postulantes": "N° Postulantes"})
     st.dataframe(tabla, hide_index=True, use_container_width=True)
 
-    st.bar_chart(data.set_index("Actividad")["N_Postulantes"])
-
     st.caption(f"Última actualización: {pipeline.get_last_updated()}")
 
 st.divider()
