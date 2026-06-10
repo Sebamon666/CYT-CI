@@ -55,3 +55,18 @@ def test_inputs_vacios_retorna_dataframe_vacio():
     result = filter_cyt(actividades, conteos)
     assert len(result) == 0
     assert list(result.columns) == ["Actividad", "N_Postulantes"]
+
+
+import pipeline
+
+
+def test_get_last_updated_sin_archivo(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipeline, "OUT_FILE", tmp_path / "no_existe.parquet")
+    assert pipeline.get_last_updated() is None
+
+
+def test_get_last_updated_con_archivo(tmp_path, monkeypatch):
+    f = tmp_path / "data.parquet"
+    f.write_text("x")
+    monkeypatch.setattr(pipeline, "OUT_FILE", f)
+    assert pipeline.get_last_updated() is not None
