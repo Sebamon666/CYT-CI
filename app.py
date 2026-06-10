@@ -23,7 +23,8 @@ else:
     st.metric("Total postulantes", int(data["N_Postulantes"].sum()))
 
     tabla = data.rename(columns={"N_Postulantes": "N° Postulantes"})
-    st.dataframe(tabla, hide_index=True, use_container_width=True)
+    altura = (len(tabla) + 1) * 35 + 3
+    st.dataframe(tabla, hide_index=True, use_container_width=True, height=altura)
 
     st.caption(f"Última actualización: {pipeline.get_last_updated()}")
 
