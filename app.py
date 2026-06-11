@@ -1,4 +1,5 @@
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 import pipeline
@@ -27,6 +28,48 @@ else:
     st.dataframe(tabla, hide_index=True, use_container_width=True, height=altura)
 
     st.caption(f"Última actualización: {pipeline.get_last_updated()}")
+
+    st.subheader("📍 Postulantes por comuna")
+
+    df_comuna = pipeline.agregar_comuna_tipo(data)
+    totales_comuna = (
+        df_comuna.groupby("Comuna")["N_Postulantes"]
+        .sum()
+        .sort_values(ascending=False)
+        .reset_index()
+    )
+    orden_comunas = totales_comuna["Comuna"].tolist()
+
+    fig_total = px.bar(
+        totales_comuna,
+        x="N_Postulantes",
+        y="Comuna",
+        orientation="h",
+        color="Comuna",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
+        text="N_Postulantes",
+        category_orders={"Comuna": orden_comunas},
+    )
+    fig_total.update_yaxes(autorange="reversed")
+    fig_total.update_layout(showlegend=False)
+    st.plotly_chart(fig_total, use_container_width=True)
+
+    fig_tipo = px.bar(
+        df_comuna,
+        x="N_Postulantes",
+        y="Comuna",
+        color="Tipo",
+        orientation="h",
+        barmode="stack",
+        text="N_Postulantes",
+        color_discrete_map={
+            "Robótica Educativa": "orange",
+            "Creación de Videojuegos": "red",
+        },
+        category_orders={"Comuna": orden_comunas},
+    )
+    fig_tipo.update_yaxes(autorange="reversed")
+    st.plotly_chart(fig_tipo, use_container_width=True)
 
 st.divider()
 
