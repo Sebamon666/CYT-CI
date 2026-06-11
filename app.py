@@ -99,6 +99,7 @@ else:
         )
         fig_total.update_yaxes(autorange="reversed")
         fig_total.update_layout(showlegend=False)
+        fig_total.update_traces(textfont_size=16, textfont_color="black")
         st.plotly_chart(fig_total, use_container_width=True)
 
     with col_bar_tipo:
@@ -117,4 +118,5 @@ else:
             category_orders={"Comuna": orden_comunas},
         )
         fig_tipo.update_yaxes(autorange="reversed")
+        fig_tipo.update_traces(textfont_size=16, textfont_color="black")
         st.plotly_chart(fig_tipo, use_container_width=True)
