@@ -84,23 +84,7 @@ else:
     )
     orden_comunas = totales_comuna["Comuna"].tolist()
 
-    col_bar_total, col_bar_tipo = st.columns(2)
-
-    with col_bar_total:
-        fig_total = px.bar(
-            totales_comuna,
-            x="N_Postulantes",
-            y="Comuna",
-            orientation="h",
-            color="Comuna",
-            color_discrete_sequence=px.colors.qualitative.Pastel,
-            text="N_Postulantes",
-            category_orders={"Comuna": orden_comunas},
-        )
-        fig_total.update_yaxes(autorange="reversed")
-        fig_total.update_layout(showlegend=False)
-        fig_total.update_traces(textfont_size=16, textfont_color="black")
-        st.plotly_chart(fig_total, use_container_width=True)
+    col_bar_tipo, col_bar_total = st.columns(2)
 
     with col_bar_tipo:
         fig_tipo = px.bar(
@@ -120,3 +104,19 @@ else:
         fig_tipo.update_yaxes(autorange="reversed")
         fig_tipo.update_traces(textfont_size=16, textfont_color="black")
         st.plotly_chart(fig_tipo, use_container_width=True)
+
+    with col_bar_total:
+        fig_total = px.bar(
+            totales_comuna,
+            x="N_Postulantes",
+            y="Comuna",
+            orientation="h",
+            color="Comuna",
+            color_discrete_sequence=px.colors.qualitative.Pastel,
+            text="N_Postulantes",
+            category_orders={"Comuna": orden_comunas},
+        )
+        fig_total.update_yaxes(autorange="reversed")
+        fig_total.update_layout(showlegend=False)
+        fig_total.update_traces(textfont_size=16, textfont_color="black")
+        st.plotly_chart(fig_total, use_container_width=True)
