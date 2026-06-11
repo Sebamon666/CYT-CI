@@ -65,6 +65,21 @@ def agregar_comuna_tipo(df):
     return df
 
 
+def fetch_conteo_postulaciones_genero(sf):
+    r = sf.query_all(
+        "SELECT Activity__c, Genre__c, COUNT(Id) cnt FROM Postulation__c "
+        "GROUP BY Activity__c, Genre__c"
+    )
+    return records_to_df(r["records"])
+
+
+def filter_cyt_genero(actividades, conteos_genero):
+    act_cyt = actividades[actividades["Area__c"] == "CYT"]
+    df = act_cyt.merge(conteos_genero, left_on="Id", right_on="Activity__c", how="inner")
+    df = df[["Name", "Genre__c", "cnt"]].rename(columns={"Name": "Actividad", "cnt": "N_Postulantes"})
+    return df.reset_index(drop=True)
+
+
 def actualizar_datos():
     sf = get_connection()
     df = filter_cyt(fetch_actividades(sf), fetch_conteo_postulaciones(sf))

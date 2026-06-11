@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pipeline import filter_cyt, parse_comuna_tipo, agregar_comuna_tipo
+from pipeline import filter_cyt, parse_comuna_tipo, agregar_comuna_tipo, filter_cyt_genero
 
 
 def test_incluye_actividad_cyt_con_postulaciones():
@@ -100,3 +100,41 @@ def test_agregar_comuna_tipo_no_muta_original():
     df = pd.DataFrame([{"Actividad": "CDI Robótica Educativa Recoleta", "N_Postulantes": 18}])
     agregar_comuna_tipo(df)
     assert list(df.columns) == ["Actividad", "N_Postulantes"]
+
+
+def test_filter_cyt_genero_incluye_actividad_cyt():
+    actividades = pd.DataFrame([
+        {"Id": "a01", "Name": "CDI Robótica Educativa Recoleta", "Area__c": "CYT"},
+    ])
+    conteos_genero = pd.DataFrame([
+        {"Activity__c": "a01", "Genre__c": "Masculino", "cnt": 12},
+        {"Activity__c": "a01", "Genre__c": "Femenino", "cnt": 6},
+    ])
+    result = filter_cyt_genero(actividades, conteos_genero)
+    assert result.to_dict("records") == [
+        {"Actividad": "CDI Robótica Educativa Recoleta", "Genre__c": "Masculino", "N_Postulantes": 12},
+        {"Actividad": "CDI Robótica Educativa Recoleta", "Genre__c": "Femenino", "N_Postulantes": 6},
+    ]
+
+
+def test_filter_cyt_genero_excluye_otra_area():
+    actividades = pd.DataFrame([
+        {"Id": "a01", "Name": "Campamento KAOS", "Area__c": "KAOS"},
+        {"Id": "a02", "Name": "CDI Creación De Videojuegos Talca", "Area__c": "CYT"},
+    ])
+    conteos_genero = pd.DataFrame([
+        {"Activity__c": "a01", "Genre__c": "Masculino", "cnt": 10},
+        {"Activity__c": "a02", "Genre__c": "Femenino", "cnt": 4},
+    ])
+    result = filter_cyt_genero(actividades, conteos_genero)
+    assert result.to_dict("records") == [
+        {"Actividad": "CDI Creación De Videojuegos Talca", "Genre__c": "Femenino", "N_Postulantes": 4},
+    ]
+
+
+def test_filter_cyt_genero_inputs_vacios():
+    actividades = pd.DataFrame(columns=["Id", "Name", "Area__c"])
+    conteos_genero = pd.DataFrame(columns=["Activity__c", "Genre__c", "cnt"])
+    result = filter_cyt_genero(actividades, conteos_genero)
+    assert len(result) == 0
+    assert list(result.columns) == ["Actividad", "Genre__c", "N_Postulantes"]
