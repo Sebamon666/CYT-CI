@@ -14,6 +14,13 @@ def load_data():
     return pd.read_parquet(pipeline.OUT_FILE)
 
 
+@st.cache_data
+def load_data_genero():
+    if not pipeline.OUT_FILE_GENERO.exists():
+        return None
+    return pd.read_parquet(pipeline.OUT_FILE_GENERO)
+
+
 st.title("🦾 CYT — Postulaciones")
 
 data = load_data()
@@ -70,6 +77,28 @@ else:
     )
     fig_tipo.update_yaxes(autorange="reversed")
     st.plotly_chart(fig_tipo, use_container_width=True)
+
+    st.subheader("👥 Postulantes por género")
+
+    data_genero = load_data_genero()
+
+    if data_genero is None or data_genero.empty:
+        st.info("Aún no hay datos de género. Presiona 'Actualizar datos'.")
+    else:
+        col_filtro, col_torta = st.columns([1, 2])
+
+        with col_filtro:
+            actividades_cyt = sorted(data_genero["Actividad"].unique())
+            actividad_seleccionada = st.selectbox("Actividad", ["Todas"] + actividades_cyt)
+
+        if actividad_seleccionada == "Todas":
+            datos_torta = data_genero.groupby("Genre__c")["N_Postulantes"].sum().reset_index()
+        else:
+            datos_torta = data_genero[data_genero["Actividad"] == actividad_seleccionada]
+
+        with col_torta:
+            fig_genero = px.pie(datos_torta, values="N_Postulantes", names="Genre__c")
+            st.plotly_chart(fig_genero, use_container_width=True)
 
 st.divider()
 
