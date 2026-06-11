@@ -7,6 +7,7 @@ from simple_salesforce import Salesforce
 
 DATA_DIR = Path(__file__).parent / "data"
 OUT_FILE = DATA_DIR / "postulaciones_cyt.parquet"
+OUT_FILE_GENERO = DATA_DIR / "postulaciones_cyt_genero.parquet"
 
 
 def get_connection():
@@ -82,9 +83,12 @@ def filter_cyt_genero(actividades, conteos_genero):
 
 def actualizar_datos():
     sf = get_connection()
-    df = filter_cyt(fetch_actividades(sf), fetch_conteo_postulaciones(sf))
+    actividades = fetch_actividades(sf)
+    df = filter_cyt(actividades, fetch_conteo_postulaciones(sf))
+    df_genero = filter_cyt_genero(actividades, fetch_conteo_postulaciones_genero(sf))
     DATA_DIR.mkdir(exist_ok=True)
     df.to_parquet(OUT_FILE, index=False)
+    df_genero.to_parquet(OUT_FILE_GENERO, index=False)
     return df
 
 
