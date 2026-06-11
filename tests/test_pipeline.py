@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pipeline import filter_cyt
+from pipeline import filter_cyt, parse_comuna_tipo, agregar_comuna_tipo
 
 
 def test_incluye_actividad_cyt_con_postulaciones():
@@ -70,3 +70,33 @@ def test_get_last_updated_con_archivo(tmp_path, monkeypatch):
     f.write_text("x")
     monkeypatch.setattr(pipeline, "OUT_FILE", f)
     assert pipeline.get_last_updated() is not None
+
+
+def test_parse_comuna_tipo_robotica():
+    assert parse_comuna_tipo("CDI Robótica Educativa Recoleta") == ("Recoleta", "Robótica Educativa")
+
+
+def test_parse_comuna_tipo_videojuegos():
+    assert parse_comuna_tipo("CDI Creación De Videojuegos Curicó") == ("Curicó", "Creación de Videojuegos")
+
+
+def test_parse_comuna_tipo_desconocido():
+    assert parse_comuna_tipo("Otra Actividad Cualquiera") == ("Otra Actividad Cualquiera", "Otro")
+
+
+def test_agregar_comuna_tipo():
+    df = pd.DataFrame([
+        {"Actividad": "CDI Robótica Educativa Recoleta", "N_Postulantes": 18},
+        {"Actividad": "CDI Creación De Videojuegos Recoleta", "N_Postulantes": 19},
+    ])
+    result = agregar_comuna_tipo(df)
+    assert result.to_dict("records") == [
+        {"Actividad": "CDI Robótica Educativa Recoleta", "N_Postulantes": 18, "Comuna": "Recoleta", "Tipo": "Robótica Educativa"},
+        {"Actividad": "CDI Creación De Videojuegos Recoleta", "N_Postulantes": 19, "Comuna": "Recoleta", "Tipo": "Creación de Videojuegos"},
+    ]
+
+
+def test_agregar_comuna_tipo_no_muta_original():
+    df = pd.DataFrame([{"Actividad": "CDI Robótica Educativa Recoleta", "N_Postulantes": 18}])
+    agregar_comuna_tipo(df)
+    assert list(df.columns) == ["Actividad", "N_Postulantes"]

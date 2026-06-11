@@ -44,6 +44,27 @@ def filter_cyt(actividades, conteos):
     return df.sort_values("N_Postulantes", ascending=False).reset_index(drop=True)
 
 
+TIPOS_CYT = {
+    "CDI Robótica Educativa ": "Robótica Educativa",
+    "CDI Creación De Videojuegos ": "Creación de Videojuegos",
+}
+
+
+def parse_comuna_tipo(nombre_actividad):
+    for prefijo, tipo in TIPOS_CYT.items():
+        if nombre_actividad.startswith(prefijo):
+            return nombre_actividad[len(prefijo):], tipo
+    return nombre_actividad, "Otro"
+
+
+def agregar_comuna_tipo(df):
+    df = df.copy()
+    comuna_tipo = df["Actividad"].apply(parse_comuna_tipo)
+    df["Comuna"] = comuna_tipo.apply(lambda x: x[0])
+    df["Tipo"] = comuna_tipo.apply(lambda x: x[1])
+    return df
+
+
 def actualizar_datos():
     sf = get_connection()
     df = filter_cyt(fetch_actividades(sf), fetch_conteo_postulaciones(sf))
