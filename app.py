@@ -3,7 +3,7 @@ import streamlit as st
 
 import pipeline
 
-st.set_page_config(page_title="CYT — Postulaciones", page_icon="🎒", layout="centered")
+st.set_page_config(page_title="CYT — Postulaciones", page_icon="🦾", layout="centered")
 
 
 @st.cache_data
@@ -13,7 +13,7 @@ def load_data():
     return pd.read_parquet(pipeline.OUT_FILE)
 
 
-st.title("🎒 CYT — Postulaciones")
+st.title("🦾 CYT — Postulaciones")
 
 data = load_data()
 
