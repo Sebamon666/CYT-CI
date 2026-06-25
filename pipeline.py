@@ -39,7 +39,7 @@ def fetch_conteo_postulaciones(sf):
 
 
 def filter_cyt(actividades, conteos):
-    act_cyt = actividades[actividades["Area__c"] == "CYT"]
+    act_cyt = actividades[actividades["Name"].str.startswith("CDI", na=False)]
     df = act_cyt.merge(conteos, left_on="Id", right_on="Activity__c", how="inner")
     df = df[["Name", "cnt"]].rename(columns={"Name": "Actividad", "cnt": "N_Postulantes"})
     return df.sort_values("N_Postulantes", ascending=False).reset_index(drop=True)
@@ -75,7 +75,7 @@ def fetch_conteo_postulaciones_genero(sf):
 
 
 def filter_cyt_genero(actividades, conteos_genero):
-    act_cyt = actividades[actividades["Area__c"] == "CYT"]
+    act_cyt = actividades[actividades["Name"].str.startswith("CDI", na=False)]
     df = act_cyt.merge(conteos_genero, left_on="Id", right_on="Activity__c", how="inner")
     df = df[["Name", "Genre__c", "cnt"]].rename(columns={"Name": "Actividad", "cnt": "N_Postulantes"})
     return df.reset_index(drop=True)
